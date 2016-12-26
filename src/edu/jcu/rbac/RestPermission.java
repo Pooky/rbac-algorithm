@@ -1,4 +1,4 @@
-package edu.jcu.rbac.model;
+package edu.jcu.rbac;
 
 import java.util.HashSet;
 import java.util.List;

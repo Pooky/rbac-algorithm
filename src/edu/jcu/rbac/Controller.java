@@ -1,4 +1,4 @@
-package edu.jcu.rbac.model;
+package edu.jcu.rbac;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -459,11 +459,14 @@ public class Controller {
 		Permission oracleBiSuite = new Permission("Oracle BI Suite");
 		Permission eclipse = new Permission("Eclipse");
 		Permission hrPortal = new Permission("HR Portal");
+		Permission basicCourses = new Permission("Basic courses");
+		
 		
 		Role basicRole = new Role();
 		basicRole.addPermission(outlook);
 		basicRole.addPermission(shareDrive);
 		basicRole.addPermission(eLearning);
+		basicRole.addPermission(basicCourses);
 
 		Role HRRole = new Role();
 		HRRole.addPermission(hrTools);
@@ -497,7 +500,7 @@ public class Controller {
 		users.add(new User("C# developer 2").addRole(basicRole).addRole(CSharpDeveloper));
 		users.add(new User("C# developer 3").addRole(basicRole).addRole(CSharpDeveloper));
 		users.add(new User("BI 2").addRole(basicRole).addRole(BiAnalysis));
-
+		users.add(new User("Wrong user").addPermission(outlook).addPermission(eLearning));
 
 	}	
 	

@@ -1,4 +1,4 @@
-package edu.jcu.rbac.model;
+package edu.jcu.rbac;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +47,11 @@ public class User {
 
 	public User addRole(Role role) {
 		this.permissions.addAll(role.getPermissions());
+		return this;
+	}
+
+	public User addPermission(Permission permission) {
+		this.permissions.add(permission);
 		return this;
 	}
 	

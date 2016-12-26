@@ -1,4 +1,4 @@
-package edu.jcu.rbac.model;
+package edu.jcu.rbac;
 
 /**
  * Konkrétní abstrakce oprávnění
