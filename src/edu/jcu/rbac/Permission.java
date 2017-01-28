@@ -8,11 +8,11 @@ package edu.jcu.rbac;
 public class Permission {
 	
 	private String name;
-	private Long id;
+	private Integer id;
 
-	public Permission(String name, Long id){
+	public Permission(String name, Integer permId){
 		this.setName(name);
-		this.setId(id);
+		this.setId(permId);
 	}
 
 	public Permission(String string) {
@@ -27,12 +27,16 @@ public class Permission {
 		this.name = name;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setId(Integer permId) {
+		this.id = permId;
+	}
+
+	public String getIdentifier() {
+		return this.name;
 	}
 	
 }

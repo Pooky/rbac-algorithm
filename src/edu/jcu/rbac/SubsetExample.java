@@ -1,24 +1,29 @@
 package edu.jcu.rbac;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 //@author http://stackoverflow.com/a/29914908
 public class SubsetExample {
 
-	private List<List<Permission>> subsets = new ArrayList<List<Permission>>();
+	private List<Set<Permission>> subsets;
 	private List<Permission> input;
 	private int k;
 	
-	public List<List<Permission>> getSubsets() {
+	public List<Set<Permission>> getSubsets() {
 		return subsets;
 	}
 	public SubsetExample(){
-		
+		this.subsets = new ArrayList<Set<Permission>>();
 	}
 	
 	
+	/**
+	 * Nalezení všech možných kombinací
+	 */
 	public void processSubsets(){
 
 		subsets.clear();
@@ -30,11 +35,10 @@ public class SubsetExample {
 			// první sekvence
 		    // first index sequence: 0, 1, 2, ...
 		    for (int i = 0; (s[i] = i) < k - 1; i++);
+		    
 		    // prvni set
 		    subsets.add(getSubset(input, s));
-		   
-		    
-		    
+
 		    for(;;) {
 		    
 		    	int i;
@@ -55,13 +59,17 @@ public class SubsetExample {
 		}
 	}
 
-	// generate actual subset by index sequence
-	
-	List<Permission> getSubset(List<Permission> input2, int[] subset) {
-	    List<Permission> result = new ArrayList<Permission>(); 
-	
+	/**
+	 * Vygenerování aktuálního páru
+	 * @param input
+	 * @param subset
+	 * @return
+	 */
+	public Set<Permission> getSubset(List<Permission> input, int[] subset) {
+	    
+		Set<Permission> result = new HashSet<Permission>();	
 	    for (int i = 0; i < subset.length; i++) 
-	        result.add(i,input2.get(subset[i]));
+	        result.add(input.get(subset[i]));
 	    
 	    return result;
 	}
@@ -77,8 +85,5 @@ public class SubsetExample {
 	public void setK(int k) {
 		this.k = k;
 	}
-	public void setSubsets(List<List<Permission>> subsets) {
-		this.subsets = subsets;
-	}
-	
+
 }

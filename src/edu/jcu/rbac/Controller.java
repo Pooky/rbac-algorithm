@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -15,15 +16,19 @@ public class Controller {
 
 	private static final Logger LOGGER = Logger.getLogger( Controller.class.getName() );
 	
-	public static final int minRoleSize = 3; // minimální velikost
-	public static final int optimalRoleSize = 4; // optimální velikost
+	public static final int minRoleSize = 5; // minimální velikost
+	public static final int optimalRoleSize = 6; // optimální velikost
+	public static final int maxRoleSize = 7; // minimální velikost
 	
 	private List<User> users; 
-	private Set<Role> uniqueRoles; // role po extrakci
+	private Set<Role> uniqueCandidateRoles; // role po extrakci
 	private List<RestPermission> restPermissions;
 	
 	private List<Role> uniqueSortedRoles; // unikátní setříděné role po extrakci
 	private List<Role> cleanedRoles; // hotové očištěné role
+
+	private Map<List<Permission>, List<User>> userUniquePermissionList;
+	
 	
 	/**
 	 * Constructor pro inicializaci controlleru
@@ -31,9 +36,12 @@ public class Controller {
 	public Controller(){
 			
 		this.users = new ArrayList<User>();
-		this.uniqueRoles = new HashSet<Role>();
+		this.uniqueCandidateRoles = new HashSet<Role>();
 		this.restPermissions = new ArrayList<RestPermission>();
 		this.cleanedRoles = new ArrayList<Role>();
+		
+		this.userUniquePermissionList = new HashMap<List<Permission>, List<User>>();
+		LOGGER.info("Starting controller");
 		
 	}
 
@@ -44,53 +52,52 @@ public class Controller {
 	 * První krok algoritmu
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
-	public void extractAllRoles() {
+	public void extractRolesFromUser(){
+	
+		LOGGER.info("Extracting all roles 2");
 		
 		SubsetExample subsetHelper = new SubsetExample();
-		
-		for(User user : users){
+		for(List<Permission> permissionSet : userUniquePermissionList.keySet()){
 			
-			//System.out.println("Current user: " + user.getName());
 			// vyber všechna oprávnění větší než k
-			if(user.getPermissions().size() < minRoleSize) {
-				addRestPermissions(user.getPermissions(), user);
+			if(permissionSet.size() < minRoleSize) {
+				//addRestPermissions(permissionSet, userUniquePermissionList.get(permissionSet));
 				continue;
 			}
 			// zpracovani opravneni
-			subsetHelper.setInput(user.getPermissions());
+			subsetHelper.setInput(permissionSet);
+
+			// hlavni limit
+			Integer maxLimit = Math.min(permissionSet.size(), maxRoleSize);
 			
-			for(int roleMaxSize = minRoleSize; roleMaxSize <= user.getPermissions().size(); roleMaxSize++){
-				
+			LOGGER.info("Current permission: " + permissionSet.size()  + " maxSize = " + maxLimit);
+			
+			for(int roleMaxSize = minRoleSize; roleMaxSize <= maxLimit; roleMaxSize++){
 				// tvoříme skupiny pro konkrétní i
-				//System.out.println("Groups of size " + roleMaxSize);
+				System.out.println("Groups of size " + roleMaxSize + ":" + permissionSet.size());
 				subsetHelper.setK(roleMaxSize);
 				subsetHelper.processSubsets();
 				
-				// vypsání rolí
-				for(List<Permission> z : subsetHelper.getSubsets()){
+				LOGGER.info("Extracting subset : done" + " " + subsetHelper.getSubsets().size());
+				
+				// procházení výsledků setů a tvorba rolí
+				for(Set<Permission> sub: subsetHelper.getSubsets()){
 					
-					// nová role
 					Role role = new Role();
-					role.setPermissions( new HashSet<Permission>(z));
-					role.addUser(user);
+					role.setPermissions(sub);
+					role.addUsers(userUniquePermissionList.get(permissionSet));
+					this.uniqueCandidateRoles.add(role);
 					
-					// pokusíme se přidat novou roli
-					if(!uniqueRoles.add(role)){
-						// pokud už taková role existuje, přidáme uživatele i k ní
-						for(Role myRole : uniqueRoles){
-							if(myRole.equals(role)){
-								myRole.users.add(user);
-							}
-						}
-					}
-				}
-			}		
+					
+				}	
+			}
 		}
-		// setřídíme role
-		uniqueSortedRoles = sortRoles(uniqueRoles);
-		printRoles(uniqueSortedRoles);
-		printRestPermissions();
+		
+		LOGGER.info("Candidate role list size:" + uniqueCandidateRoles.size());
+		
+		uniqueSortedRoles = sortRoles(uniqueCandidateRoles);
+		//printRoles(uniqueSortedRoles);
+		//printRestPermissions();
 		
 	}
 
@@ -102,6 +109,8 @@ public class Controller {
 	 * 
 	 */
 	public void solveRolesParents(){
+		
+		LOGGER.info("Solving role parents and cleaning");
 		
 		Iterator<Role> firstIterator, secondIterator;
 		Role currentRole, roleToTest = null;
@@ -176,7 +185,7 @@ public class Controller {
 		        	 
 		        	 if(roleToTest.containsAnyOfThisPermissions(currentRole.getPermissions())){
 		        		 if(roleToTest.containsAllUsers(currentRole.getUsers())){
-		        			 LOGGER.info("Removing role: " + roleToTest.toString() + " becouse is duplicit of " + currentRole.toString());
+		        			 //LOGGER.info("Removing role: " + roleToTest.toString() + " becouse is duplicit of " + currentRole.toString());
 		        			 // odebereme tuto roli, protože je duplicitní
 		        			 secondIterator.remove();
 		        			 allClean = false;
@@ -186,13 +195,13 @@ public class Controller {
 		         }		   
 		         // reset listů, protože došlo k přidání či rozdělení role
 		         if(!allClean){
-		        	 // znovu setřídíme
-		        	 sortRoles(uniqueSortedRoles);
-		        	 firstIterator = uniqueSortedRoles.iterator();
-		        	 break;
+			        	 // znovu setřídíme
+			        	 sortRoles(uniqueSortedRoles);
+			        	 firstIterator = uniqueSortedRoles.iterator();
+			        	 break;
 		         }else{
-		        	 cleanedRoles.add(currentRole);
-		        	 firstIterator.remove();
+		        	 	cleanedRoles.add(currentRole);
+		        	 	firstIterator.remove();
 		         }
 			 }
 	      }
@@ -402,13 +411,15 @@ public class Controller {
 	}
 
 	private List<Role> sortRoles(Set<Role> roles) {
-		return sortRoles(new ArrayList<Role>(uniqueRoles));
+		return sortRoles(new ArrayList<Role>(uniqueCandidateRoles));
 	}
 	/**
 	 * Setřídění rolí podle počtu uživatelů v roli
 	 * @return 
 	 */
 	protected List<Role> sortRoles(List<Role> rolesToSort){
+		
+		LOGGER.info("Starting sorting of list size: " + rolesToSort.size());
 		
 		Collections.sort(rolesToSort, new Comparator<Object>() 
 		{
@@ -443,66 +454,32 @@ public class Controller {
 		return rolesToSort;
 		
 	}
-	/**
-	 * Naplnění dat a vytvoření uživatelů
-	 */
-	protected void initUserData(){
-		
-		Permission outlook = new Permission("Outlook");
-		Permission shareDrive = new Permission("Sharedrive");
-		Permission codeAcademy = new Permission("Code Academy");
-		Permission svn = new Permission("SVN Access");
-		Permission hrTools = new Permission("HR Tools");
-		Permission csharp = new Permission("C# Tools");
-		Permission msAccess = new Permission("MS Accesss");
-		Permission eLearning = new Permission("E-learning");
-		Permission oracleBiSuite = new Permission("Oracle BI Suite");
-		Permission eclipse = new Permission("Eclipse");
-		Permission hrPortal = new Permission("HR Portal");
-		Permission basicCourses = new Permission("Basic courses");
-		
-		
-		Role basicRole = new Role();
-		basicRole.addPermission(outlook);
-		basicRole.addPermission(shareDrive);
-		basicRole.addPermission(eLearning);
-		basicRole.addPermission(basicCourses);
 
-		Role HRRole = new Role();
-		HRRole.addPermission(hrTools);
-		HRRole.addPermission(msAccess);
-		HRRole.addPermission(hrPortal);
-		
-		Role BiAnalysis = new Role();
-		BiAnalysis.addPermission(svn);
-		BiAnalysis.addPermission(msAccess);
-		BiAnalysis.addPermission(oracleBiSuite);
-		
-		Role CSharpDeveloper = new Role();
-		CSharpDeveloper.addPermission(codeAcademy);
-		CSharpDeveloper.addPermission(svn);
-		CSharpDeveloper.addPermission(csharp);
-		
-		Role JavaDeveloper = new Role();
-		JavaDeveloper.addPermission(codeAcademy);
-		JavaDeveloper.addPermission(svn);
-		JavaDeveloper.addPermission(eclipse);
-		
-		// Vytvoření uživatelů
-		users.add(new User("HR 1").addRole(basicRole).addRole(HRRole));
-		users.add(new User("HR 2").addRole(basicRole).addRole(HRRole));
-		users.add(new User("BI 1").addRole(basicRole).addRole(BiAnalysis));
-		users.add(new User("C# developer 1").addRole(basicRole).addRole(CSharpDeveloper));
-		users.add(new User("Java Developer 1").addRole(basicRole).addRole(JavaDeveloper));
-		users.add(new User("Java Developer 2").addRole(basicRole).addRole(JavaDeveloper));
-		users.add(new User("HR 3").addRole(basicRole).addRole(HRRole));
-		users.add(new User("HR 4").addRole(basicRole).addRole(HRRole));
-		users.add(new User("C# developer 2").addRole(basicRole).addRole(CSharpDeveloper));
-		users.add(new User("C# developer 3").addRole(basicRole).addRole(CSharpDeveloper));
-		users.add(new User("BI 2").addRole(basicRole).addRole(BiAnalysis));
-		users.add(new User("Wrong user").addPermission(outlook).addPermission(eLearning));
 
-	}	
+	public void initUserData(List<User> list) {
+		this.users = list;
+	}
+
+
+	public void prepareData() {
+
+		// clean users which, have same permissions
+		for(User user : this.users){
+			if(user.getPermissions().size() < 26){
+				// přiřazení permission a uživatel
+				// unikátní
+				if(userUniquePermissionList.get(user.getPermissions()) != null){
+					userUniquePermissionList.get(user.getPermissions()).add(user);
+				}else{
+					//novy zaznam
+					userUniquePermissionList.put(user.getPermissions(), new ArrayList<User>(Arrays.asList(user)));
+				}
+			}
+		}
+		LOGGER.info("Number of permissions set: " + userUniquePermissionList.keySet().size());
+		
+	}
+
 	
 	
 }

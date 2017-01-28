@@ -6,12 +6,12 @@ import java.util.List;
 public class User {
 
 	private String name;
-	private Long id;
+	private Integer id;
 	private List<Permission> permissions = new ArrayList<Permission>();
 	
-	public User(String name, Long id){
+	public User(String name, Integer userId){
 		this.setName(name);
-		this.id = id;
+		this.id = userId;
 	}
 	
 	public User() {
@@ -53,6 +53,10 @@ public class User {
 	public User addPermission(Permission permission) {
 		this.permissions.add(permission);
 		return this;
+	}
+
+	public String getIdentifier() {
+		return this.name;
 	}
 	
 	
