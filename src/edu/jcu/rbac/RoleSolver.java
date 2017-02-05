@@ -12,95 +12,35 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public class Controller {
+import edu.jcu.rbac.combinations.SubsetExample;
+import edu.jcu.rbac.common.Parameters;
+import edu.jcu.rbac.elements.Permission;
+import edu.jcu.rbac.elements.RestPermission;
+import edu.jcu.rbac.elements.Role;
+import edu.jcu.rbac.elements.User;
 
-	private static final Logger LOGGER = Logger.getLogger( Controller.class.getName() );
-	
-	public static final int minRoleSize = 5; // minimální velikost
-	public static final int optimalRoleSize = 6; // optimální velikost
-	public static final int maxRoleSize = 7; // minimální velikost
-	
-	private List<User> users; 
-	private Set<Role> uniqueCandidateRoles; // role po extrakci
+public class RoleSolver {
+
+	private static final Logger LOGGER = Logger.getLogger( RoleSolver.class.getName() );
+
+	private List<Role> candidateRoles; // role po extrakci
 	private List<RestPermission> restPermissions;
 	
 	private List<Role> uniqueSortedRoles; // unikátní setříděné role po extrakci
 	private List<Role> cleanedRoles; // hotové očištěné role
 
-	private Map<List<Permission>, List<User>> userUniquePermissionList;
-	
-	
 	/**
 	 * Constructor pro inicializaci controlleru
 	 */
-	public Controller(){
-			
-		this.users = new ArrayList<User>();
-		this.uniqueCandidateRoles = new HashSet<Role>();
-		this.restPermissions = new ArrayList<RestPermission>();
-		this.cleanedRoles = new ArrayList<Role>();
+	public RoleSolver(List<Role> candidateRoles) {
 		
-		this.userUniquePermissionList = new HashMap<List<Permission>, List<User>>();
+		this.candidateRoles = candidateRoles;
+		restPermissions = new ArrayList<RestPermission>();
+		uniqueSortedRoles = new ArrayList<Role>();
+		cleanedRoles = new ArrayList<Role>();
+
 		LOGGER.info("Starting controller");
-		
 	}
-
-
-	/**
-	 * Extract all roles from set
-	 * 
-	 * První krok algoritmu
-	 * 
-	 */
-	public void extractRolesFromUser(){
-	
-		LOGGER.info("Extracting all roles 2");
-		
-		SubsetExample subsetHelper = new SubsetExample();
-		for(List<Permission> permissionSet : userUniquePermissionList.keySet()){
-			
-			// vyber všechna oprávnění větší než k
-			if(permissionSet.size() < minRoleSize) {
-				//addRestPermissions(permissionSet, userUniquePermissionList.get(permissionSet));
-				continue;
-			}
-			// zpracovani opravneni
-			subsetHelper.setInput(permissionSet);
-
-			// hlavni limit
-			Integer maxLimit = Math.min(permissionSet.size(), maxRoleSize);
-			
-			LOGGER.info("Current permission: " + permissionSet.size()  + " maxSize = " + maxLimit);
-			
-			for(int roleMaxSize = minRoleSize; roleMaxSize <= maxLimit; roleMaxSize++){
-				// tvoříme skupiny pro konkrétní i
-				System.out.println("Groups of size " + roleMaxSize + ":" + permissionSet.size());
-				subsetHelper.setK(roleMaxSize);
-				subsetHelper.processSubsets();
-				
-				LOGGER.info("Extracting subset : done" + " " + subsetHelper.getSubsets().size());
-				
-				// procházení výsledků setů a tvorba rolí
-				for(Set<Permission> sub: subsetHelper.getSubsets()){
-					
-					Role role = new Role();
-					role.setPermissions(sub);
-					role.addUsers(userUniquePermissionList.get(permissionSet));
-					this.uniqueCandidateRoles.add(role);
-					
-					
-				}	
-			}
-		}
-		
-		LOGGER.info("Candidate role list size:" + uniqueCandidateRoles.size());
-		
-		uniqueSortedRoles = sortRoles(uniqueCandidateRoles);
-		//printRoles(uniqueSortedRoles);
-		//printRestPermissions();
-		
-	}
-
 	/**
 	 * Tato funkce iteruje přes list rolí, které jsme extrahovali
 	 * následně každou roli porovná a vyřeší hiearchické členění parent -> child
@@ -114,6 +54,8 @@ public class Controller {
 		
 		Iterator<Role> firstIterator, secondIterator;
 		Role currentRole, roleToTest = null;
+		
+		uniqueSortedRoles = sortRoles(candidateRoles);
 
 		Boolean allClean = false;
 		// dokud není čisto
@@ -185,7 +127,7 @@ public class Controller {
 		        	 
 		        	 if(roleToTest.containsAnyOfThisPermissions(currentRole.getPermissions())){
 		        		 if(roleToTest.containsAllUsers(currentRole.getUsers())){
-		        			 //LOGGER.info("Removing role: " + roleToTest.toString() + " becouse is duplicit of " + currentRole.toString());
+		        			 LOGGER.info("Removing role: " + roleToTest.toString() + " becouse is duplicit of " + currentRole.toString());
 		        			 // odebereme tuto roli, protože je duplicitní
 		        			 secondIterator.remove();
 		        			 allClean = false;
@@ -250,57 +192,6 @@ public class Controller {
 		
 		
 	}
-
-
-	/**
-	 * Vyřešení hiearchické závislosti rolí
-	 * @deprecated
-	 * @param currentRole
-	 * @param roleToTest
-	 * @return 
-	 */
-	private boolean solveRoleHiearchy(Role currentRole, Role roleToTest) {
-		
-		boolean wasListChanged = false;
-		
-		// aktuální role je rodič
-		if(currentRole.isParent(roleToTest)){
-			if(canWeSplitRoles(currentRole, roleToTest) == false){
-				wasListChanged = false;
-			}else{
-				splitRoles(currentRole, roleToTest);
-				wasListChanged = true;
-			}
-		}
-		
-		// aktuální role má nadřazenou roli podsebou
-		if(roleToTest.isParent(currentRole)){
-			if(canWeSplitRoles(roleToTest, currentRole) == false){
-				// nelze role rozdělit, proto zachováme podřazenou roli a rozdělíme nadřazenou
-				// všem uživatelům přidáme roli podřazenou a zbytek oprávnění vložíme do zbytkových
-				
-				List<Permission> permissionsToSave = new ArrayList<Permission>(roleToTest.getPermissions());
-				permissionsToSave.removeAll(currentRole.getPermissions());
-				
-				// přiřadíme podřazené roli uživatele nadřazené role
-				currentRole.addUsers(roleToTest.getUsers());
-				
-				// provedeme vymazání role a uložení oprávnění do zbytkových
-				for(Permission rest : permissionsToSave){
-					addRestPermission(rest, roleToTest.getUsers());
-				}
-				
-				
-			}else{
-				splitRoles(roleToTest, currentRole);
-				wasListChanged = true;
-			}
-		}
-		
-		return wasListChanged;
-	}
-
-
 	/**
 	 * Funkce která ověří, jestli se dvě role dají dělit
 	 * Ověřuje velikost oprávnění po extrakci jedné role z druhé musí být větší nebo rovna k
@@ -311,7 +202,7 @@ public class Controller {
 	private boolean canWeSplitRoles(Role roleToBeSplited, Role roleToKeep){
 		
 		// test jestli můžeme role dělit, k je nejmenší velikost role
-		if((roleToBeSplited.getPermissions().size() - roleToKeep.getPermissions().size()) < minRoleSize){
+		if((roleToBeSplited.getPermissions().size() - roleToKeep.getPermissions().size()) < Parameters.minRoleSize.getValue()){
 			return false;
 		}else{
 			return true;
@@ -384,7 +275,9 @@ public class Controller {
 		RestPermission restPermission = new RestPermission(permission, user);
 		
 		if(restPermissions.contains(restPermission)){
-			restPermissions.get(restPermissions.indexOf(restPermission)).addUser(user);
+			RestPermission x = restPermissions.get(restPermissions.indexOf(restPermission));
+			if(!x.getUsers().contains(user))
+				x.addUser(user);
 		}else{
 			restPermissions.add(restPermission);
 		}
@@ -411,7 +304,7 @@ public class Controller {
 	}
 
 	private List<Role> sortRoles(Set<Role> roles) {
-		return sortRoles(new ArrayList<Role>(uniqueCandidateRoles));
+		return sortRoles(new ArrayList<Role>(candidateRoles));
 	}
 	/**
 	 * Setřídění rolí podle počtu uživatelů v roli
@@ -434,8 +327,8 @@ public class Controller {
 		    		return -1;
 		    	}else{
 		    		
-		    		int diffA = Math.abs(roleA.getPermissionsCount() - optimalRoleSize);
-		    		int diffB = Math.abs(roleB.getPermissionsCount() - optimalRoleSize);
+		    		int diffA = Math.abs(roleA.getPermissionsCount() - Parameters.optimalRoleSize.getValue());
+		    		int diffB = Math.abs(roleB.getPermissionsCount() - Parameters.optimalRoleSize.getValue());
 		    		// rozdíl v optimální velikosti
 		    		if(diffA < diffB){
 		    			return -1;
@@ -452,31 +345,6 @@ public class Controller {
 		    }
 		});
 		return rolesToSort;
-		
-	}
-
-
-	public void initUserData(List<User> list) {
-		this.users = list;
-	}
-
-
-	public void prepareData() {
-
-		// clean users which, have same permissions
-		for(User user : this.users){
-			if(user.getPermissions().size() < 26){
-				// přiřazení permission a uživatel
-				// unikátní
-				if(userUniquePermissionList.get(user.getPermissions()) != null){
-					userUniquePermissionList.get(user.getPermissions()).add(user);
-				}else{
-					//novy zaznam
-					userUniquePermissionList.put(user.getPermissions(), new ArrayList<User>(Arrays.asList(user)));
-				}
-			}
-		}
-		LOGGER.info("Number of permissions set: " + userUniquePermissionList.keySet().size());
 		
 	}
 

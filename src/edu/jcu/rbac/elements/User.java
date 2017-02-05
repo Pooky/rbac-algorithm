@@ -1,4 +1,4 @@
-package edu.jcu.rbac;
+package edu.jcu.rbac.elements;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,10 +1,13 @@
-package edu.jcu.rbac;
+package edu.jcu.rbac.combinations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import edu.jcu.rbac.elements.Permission;
+import edu.jcu.rbac.elements.Role;
 
 public class SubSetProcessor {
 	

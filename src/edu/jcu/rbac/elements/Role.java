@@ -1,4 +1,4 @@
-package edu.jcu.rbac;
+package edu.jcu.rbac.elements;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -114,6 +114,20 @@ public class Role {
 
 	public List<User> getUsers() {
 		return this.users;
+	}
+	/**
+	 * Naplnění uživatelů z daného oprávnění
+	 */
+	public void calculateUsersFromPermissions(){
+		
+		for(Permission perm : permissions){
+			for(User user : perm.getUsers()){
+				this.addUser(user);
+			}
+		}
+		for(Permission perm : permissions){
+			users.retainAll(perm.getUsers());
+		}
 	}
 
 	public void addChild(Role role) {

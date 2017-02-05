@@ -1,4 +1,4 @@
-package edu.jcu.rbac;
+package edu.jcu.rbac.combinations;
 
 import java.util.ArrayList;
 import java.util.HashSet;

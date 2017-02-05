@@ -1,4 +1,4 @@
-package edu.jcu.rbac;
+package edu.jcu.rbac.combinations;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

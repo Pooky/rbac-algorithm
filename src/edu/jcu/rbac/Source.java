@@ -12,6 +12,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.jcu.rbac.elements.Permission;
+import edu.jcu.rbac.elements.Role;
+import edu.jcu.rbac.elements.User;
+
 public class Source {
 	
 	private static final Logger LOGGER = Logger.getLogger( Source.class.getName() );
@@ -20,18 +24,33 @@ public class Source {
 	private ArrayList<Permission> permissions; 
 	
 	public Source(){
+		
 		LOGGER.setLevel(Level.WARNING);
+		users = new ArrayList<User>();
+		permissions = new ArrayList<Permission>();
+		
+	}
+	
+	
+	public List<User> initDataSet1(){
+		return this.getDataSet("data/test-data3.csv");
+	}
+	public List<User> initDataSet2(){
+		return this.getDataSet("data/sqlresults/users_permission_from_roles_max_25_permission.csv");
+	}
+	public List<User> initDataSet3(){
+		return this.getDataSet("data/sqlresults/users_permission_from_roles_max_15_permission.csv");
 	}
 	/**
 	 * Vytvoření dat z db export
 	 * @return
 	 */
-	public List<User> getDataSet1(){
+	public List<User> getDataSet(String csvFileName){
 		
 		Map<Integer, Permission> permissions = new HashMap<Integer, Permission>();
 		Map<Integer, User> users = new HashMap<Integer, User>();
 		
-        String csvFile = "data/test-data3.csv";
+        String csvFile = csvFileName;
         String line = "";
         String cvsSplitBy = ";";
         
@@ -69,17 +88,19 @@ public class Source {
 						continue;
 					}               		
                 		
-                		// check permissions
-                		perm = permissions.get(permId);
-                		if(perm == null){
-                			perm = new Permission("Oprávnění " + permId, permId);
-                			permissions.put(permId, perm);
-                		}
                 		// check users
                 		user = users.get(userId);
                 		if(user == null){
                 			user = new User("Uživatel " + userId, userId);
                 			users.put(userId, user);
+                		}
+                 		// check permissions
+                		perm = permissions.get(permId);
+                		if(perm == null){
+                			perm = new Permission("Oprávnění " + permId, permId);
+                			permissions.put(permId, perm);
+                		}else{
+                			perm.addUser(user); // uživatel k oprávnění
                 		}
                 		
                 		// vložíme oprávnění k uživateli
@@ -164,6 +185,16 @@ public class Source {
 		users.add(new User("BI 2").addRole(basicRole).addRole(BiAnalysis));
 		users.add(new User("Wrong user").addPermission(outlook).addPermission(eLearning));
 
+		
+		for(User user : users){
+			for(Permission permission : user.getPermissions()){
+				permission.addUser(user);
+				
+				if(!permissions.contains(permission))
+					permissions.add(permission);
+					
+			}
+		}
 		
 		return users;
 		
