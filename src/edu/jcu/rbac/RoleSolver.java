@@ -46,14 +46,16 @@ public class RoleSolver {
 	 * následně každou roli porovná a vyřeší hiearchické členění parent -> child
 	 * v dalším kroku jsou tyto role očištěny a uloženy do pole
 	 * CleanedRoles, kde jsou také setříděny
+	 * @return 
 	 * 
 	 */
-	public void solveRolesParents(){
+	public List<Role> solveRolesParents(){
 		
 		LOGGER.info("Solving role parents and cleaning");
 		
 		Iterator<Role> firstIterator, secondIterator;
 		Role currentRole, roleToTest = null;
+		Cleaner cleaner = new Cleaner(this.restPermissions);
 		
 		uniqueSortedRoles = sortRoles(candidateRoles);
 
@@ -109,7 +111,7 @@ public class RoleSolver {
 		     				
 		     				// provedeme vymazání role a uložení oprávnění do zbytkových
 		     				for(Permission rest : permissionsToSave){
-		     					addRestPermission(rest, roleToTest.getUsers());
+		     					cleaner.addRestPermission(rest, roleToTest.getUsers());
 		     				}
 		     				// odebereme roli
 		     				secondIterator.remove();		     				
@@ -150,37 +152,21 @@ public class RoleSolver {
 		
 		//znova setřídíme
 		sortRoles(cleanedRoles);
-		cleanRestPermissions(); // očištění
+		
+		cleaner.cleanRestPermissions(cleanedRoles);
 		
 		printRoles(cleanedRoles);
 		printRestPermissions();
-	}
-	
-	private void cleanRestPermissions(){
-	
+		
+		int i = 1;
+		// pridani ID
 		for(Role role : cleanedRoles){
-			cleanRestPermission(role.getPermissions(), role.getUsers());
+			role.setId(i);
+			i++;
 		}
 		
+		return cleanedRoles;
 	}
-	
-	private void cleanRestPermission(Set<Permission> permissions, List<User> users) {
-		
-		Iterator<RestPermission> itr = restPermissions.iterator();
-		while(itr.hasNext()){
-			RestPermission rest = itr.next();
-			for(Permission perm : permissions){
-				if(rest.getPermission().equals(perm)){
-					rest.removeAllUsers(users);
-				}
-			}
-			// nemáme už žádné uživatele, odebereme oprávnění
-			if(rest.getUsers().size() == 0)
-				itr.remove();
-		}
-		
-	}
-
 
 	private void printRestPermissions() {
 		
@@ -259,50 +245,6 @@ public class RoleSolver {
 	}
 
 
-	/**
-	 * Přidání oprávnění do zbytkových a přiřazení jich k uživateli
-	 * @param permissions
-	 * @param user
-	 */
-	private void addRestPermissions(List<Permission> permissions, User user) {
-		for(Permission permission : permissions){
-			addRestPermission(permission, user);
-		}
-	}
-	
-	private void addRestPermission(Permission permission, User user){
-		
-		RestPermission restPermission = new RestPermission(permission, user);
-		
-		if(restPermissions.contains(restPermission)){
-			RestPermission x = restPermissions.get(restPermissions.indexOf(restPermission));
-			if(!x.getUsers().contains(user))
-				x.addUser(user);
-		}else{
-			restPermissions.add(restPermission);
-		}
-		
-	}
-	private void addRestPermissionsFromRole(Role role) {
-		
-		for(Permission permission : role.getPermissions()){
-			addRestPermission(permission, role.getUsers());
-		}
-		
-	}
-	/**
-	 * Přidáme všechny uživatele k jednomu oprávnění
-	 * @param permission
-	 * @param users
-	 */
-	private void addRestPermission(Permission permission, List<User> users) {
-			
-		for(User user: users){
-			addRestPermission(permission, user);
-		}
-		
-	}
-
 	private List<Role> sortRoles(Set<Role> roles) {
 		return sortRoles(new ArrayList<Role>(candidateRoles));
 	}
@@ -346,6 +288,12 @@ public class RoleSolver {
 		});
 		return rolesToSort;
 		
+	}
+	public List<RestPermission> getRestPermissions() {
+		return this.restPermissions;
+	}
+	public void setRestPermissions(List<RestPermission> restPermissions2) {
+		this.restPermissions = restPermissions2;
 	}
 
 	

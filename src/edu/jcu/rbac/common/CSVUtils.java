@@ -18,7 +18,7 @@ public class CSVUtils {
 
     //https://tools.ietf.org/html/rfc4180
     private static String followCVSformat(String value) {
-
+    	
         String result = value;
         if (result.contains("\"")) {
             result = result.replace("\"", "\"\"");

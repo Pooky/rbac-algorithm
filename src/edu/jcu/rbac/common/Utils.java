@@ -7,20 +7,22 @@ import java.util.logging.Logger;
 
 import edu.jcu.rbac.Main;
 import edu.jcu.rbac.elements.Permission;
+import edu.jcu.rbac.elements.RestPermission;
 import edu.jcu.rbac.elements.Role;
+import edu.jcu.rbac.elements.Sequence;
 
 public class Utils {
 	
 	
 	static Logger logger  = Logger.getLogger(Main.class.getName());
 	
-	public static String toString(List<Permission> permissions) {
+	public static String toString(List<? extends IElement> permissions) {
 		
 		StringBuilder builder = new StringBuilder();
 		builder.append("[");
 		
-		for(Permission perm : permissions){
-			builder.append(perm.getName());
+		for(IElement perm : permissions){
+			builder.append(perm.getIdentifier());
 			builder.append(",");
 		}
 		builder.append("]");
@@ -53,5 +55,6 @@ public class Utils {
 		}
 		return -1;
 	}
+	
 	
 }

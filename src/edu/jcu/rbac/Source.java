@@ -25,7 +25,7 @@ public class Source {
 	
 	public Source(){
 		
-		LOGGER.setLevel(Level.WARNING);
+		LOGGER.info("Starting source");
 		users = new ArrayList<User>();
 		permissions = new ArrayList<Permission>();
 		
@@ -41,52 +41,48 @@ public class Source {
 	public List<User> initDataSet3(){
 		return this.getDataSet("data/sqlresults/users_permission_from_roles_max_15_permission.csv");
 	}
+	public List<User> initDataSet4(){
+		return this.getDataSet("data/test.csv");
+	}
 	/**
 	 * Vytvoření dat z db export
 	 * @return
 	 */
 	public List<User> getDataSet(String csvFileName){
 		
-		Map<Integer, Permission> permissions = new HashMap<Integer, Permission>();
-		Map<Integer, User> users = new HashMap<Integer, User>();
+		Map<String, Permission> permissions = new HashMap<String, Permission>();
+		Map<String, User> users = new HashMap<String, User>();
 		
         String csvFile = csvFileName;
         String line = "";
         String cvsSplitBy = ";";
+        int i = 0;
         
-
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
         	
-        	Integer permId, userId;
+        	String permId, userId;
             
             Permission perm;
             User user;
-            
-            int i = 0;
-        		
         		while ((line = br.readLine()) != null) {
         			
-        			userId = null;
-        			permId = null;
-        			
-                // use comma as separator
-                String[] data = line.split(cvsSplitBy);
-                if(data.length > 1){
-                		LOGGER.log(Level.INFO, "User [id= " + data[0] + " , permission=" + data[1] + "]");
-                }
-                // přeskočíme první řádek
+	        		userId = null;
+	        		permId = null;
+	        			
+	                // use comma as separator
+	                String[] data = line.split(cvsSplitBy);
+	                if(data.length > 1){
+	                		LOGGER.log(Level.INFO, "User [id= " + data[0] + " , permission=" + data[1] + "]");
+	                }
+                	// přeskočíme první řádek
                 	if(data.length > 1 && i != 0){	
                 		
-					try {  
-					 	userId = Integer.parseInt(data[0]);
-					 	permId = Integer.parseInt(data[1]);
-					} catch (NumberFormatException e) {  
-					    LOGGER.log(Level.WARNING, "Řádek č." + i + " se nedá parsovat.", e);
-					}
-					
-					if(userId == null || permId == null){
-						continue;
-					}               		
+					 	userId = data[0];
+					 	permId = data[1];
+
+						if(userId == null || permId == null){
+							continue;
+						}               		
                 		
                 		// check users
                 		user = users.get(userId);
@@ -99,12 +95,9 @@ public class Source {
                 		if(perm == null){
                 			perm = new Permission("Oprávnění " + permId, permId);
                 			permissions.put(permId, perm);
-                		}else{
-                			perm.addUser(user); // uživatel k oprávnění
                 		}
-                		
-                		// vložíme oprávnění k uživateli
-                		user.addPermission(perm); 		
+                		perm.addUser(user); // uživatel k oprávnění
+                		user.addPermission(perm); 	// vložíme oprávnění k uživateli	
                 		
                 }
                 i++;
@@ -117,6 +110,10 @@ public class Source {
 
         this.users = new ArrayList<User>(users.values());
         this.setPermissions(new ArrayList<Permission>(permissions.values()));
+        
+        LOGGER.info("Source :" + csvFileName + " lines:" + i);
+        LOGGER.info("users:" + this.getUsers().size());
+        LOGGER.info("permissions:" + this.getPermissions().size()); 
         
 		return this.users;
 		

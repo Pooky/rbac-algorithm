@@ -4,12 +4,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.jcu.rbac.common.IElement;
+
 /**
  * Zbytkové oprávnění, ze kterého nelze vytvořit role
  * @author martin.klima
  *
  */
-public class RestPermission {
+public class RestPermission implements IElement {
 
 	protected Set<User> users;
 	protected Permission permission;
@@ -75,6 +77,11 @@ public class RestPermission {
 
 	public void setPermission(Permission permission) {
 		this.permission = permission;
+	}
+
+	@Override
+	public String getIdentifier() {
+		return this.getPermission().getIdentifier();
 	}
 	
 }

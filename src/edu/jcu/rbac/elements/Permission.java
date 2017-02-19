@@ -5,18 +5,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.jcu.rbac.common.IElement;
+import edu.jcu.rbac.common.Utils;
+
 /**
  * Konkrétní abstrakce oprávnění
  * @author martin.klima
  *
  */
-public class Permission {
+public class Permission implements IElement {
 	
 	private String name;
-	private Integer id;
+	private String id;
 	private List<User> users; // uživatelé, kteří mají toto oprávnění
 
-	public Permission(String name, Integer permId){
+	public Permission(String name, String permId){
 		this(name);
 		this.setId(permId);
 	}
@@ -34,16 +37,16 @@ public class Permission {
 		this.name = name;
 	}
 
-	public Integer getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Integer permId) {
+	public void setId(String permId) {
 		this.id = permId;
 	}
 
 	public String getIdentifier() {
-		return this.name;
+		return this.id.toString();
 	}
 
 	public void addUser(User user) {
@@ -58,5 +61,15 @@ public class Permission {
 	public void setUsers(List<User> users) {
 		this.users = users;
 	}
-	
+	@Override
+	public String toString() {
+		
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append(this.getIdentifier() + " : ");
+		builder.append(Utils.toString(users));
+		
+		return builder.toString();
+
+	}
 }

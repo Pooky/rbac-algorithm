@@ -3,13 +3,15 @@ package edu.jcu.rbac.elements;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+import edu.jcu.rbac.common.IElement;
+
+public class User implements IElement {
 
 	private String name;
-	private Integer id;
+	private String id;
 	private List<Permission> permissions = new ArrayList<Permission>();
 	
-	public User(String name, Integer userId){
+	public User(String name, String userId){
 		this.setName(name);
 		this.id = userId;
 	}
@@ -56,7 +58,7 @@ public class User {
 	}
 
 	public String getIdentifier() {
-		return this.name;
+		return this.id.toString();
 	}
 	
 	

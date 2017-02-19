@@ -5,17 +5,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.jcu.rbac.common.IElement;
+
 /**
  * Abstrace nově vytvořené role
  * @author martin.klima
  *
  */
-public class Role {
+public class Role implements IElement {
 
 	Set<Permission> permissions = new HashSet<Permission>();
 	List<User> users = new ArrayList<User>();
 	List<Role> childrens = new ArrayList<Role>();
 	Role parent;
+	
+	private String name;
+	private Integer id;
 	
 	public Role(){
 		
@@ -27,6 +32,10 @@ public class Role {
 
 	public void setPermissions(Set<Permission> permissions) {
 		this.permissions = permissions;
+	}
+	
+	public String getIdentifier() {
+		return this.id.toString();
 	}
 	
 	public int getPermissionsCount(){
@@ -197,6 +206,10 @@ public class Role {
 		}
 		output.deleteCharAt(output.length()-1);
 		return output.toString();
+	}
+
+	public void setId(int i) {
+		this.id = i;
 	}
 	
 }

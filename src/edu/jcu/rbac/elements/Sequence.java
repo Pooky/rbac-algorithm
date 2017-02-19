@@ -15,10 +15,12 @@ public class Sequence {
 		this.permissions = new ArrayList<Permission>();
 	}
 	
-	public void addPermission(Permission permission){
+	public boolean addPermission(Permission permission){
 		if(!permissions.contains(permission)){
 			permissions.add(permission);
+			return true;
 		}	
+		return false;
 	}
 	/**
 	 * Je sequence validní?
@@ -30,7 +32,7 @@ public class Sequence {
 		
 		for(Permission permission: permissions){
 			
-			List<User> usersToCompare = permission.getUsers();
+			List<User> commonUsers = new ArrayList<>(permission.getUsers());
 			// iterace pres list a porovnani
 			for(Permission secondPerm: permissions){
 				
@@ -38,11 +40,10 @@ public class Sequence {
 					continue;
 				
 				// stejné hodnoty v obou listech
-				List<User> common = new ArrayList<User>(usersToCompare);
-				common.retainAll(secondPerm.getUsers());
+				commonUsers.retainAll(secondPerm.getUsers());
 				
 				// musí mít stejné elementy
-				if(common.size() < Parameters.minUsersForRole.getValue()){
+				if(commonUsers.size() < Parameters.minUsersForRole.getValue()){
 					isValid = false;
 					break;
 				}
@@ -95,5 +96,23 @@ public class Sequence {
 	public void setUsers(List<User> users) {
 		this.users = users;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		
+		if(obj instanceof Sequence == false){
+			return false;
+		}
+
+		List<Permission> seqPerm = ((Sequence) obj).getPermissions();
+		
+		if(seqPerm.size() == getPermissions().size() && getPermissions().containsAll(seqPerm)){
+			return true;
+		}
+		return false;
+
+	}
+	
+	
 	
 }
