@@ -1,12 +1,17 @@
 package edu.jcu.rbac;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.time.StopWatch;
+
+import edu.jcu.rbac.combinations.Combinations;
 import edu.jcu.rbac.combinations.SubsetExample;
 import edu.jcu.rbac.common.Parameters;
+import edu.jcu.rbac.common.Utils;
 import edu.jcu.rbac.elements.Permission;
 import edu.jcu.rbac.elements.Role;
 import edu.jcu.rbac.elements.Sequence;
@@ -34,12 +39,23 @@ public class RoleExtractor {
 	 * Extract all roles from set
 	 */
 	public void extractRolesFromUser(){
-	
+
+		final StopWatch stopwatch = new StopWatch();
+		stopwatch.start();
+		
+		int i = 1;
+
+		/** Starting calculation **/
 		LOGGER.info("Extracting all roles");
+		LOGGER.info("Starting long calculations: " + stopwatch);
 		
 		SubsetExample subsetHelper = new SubsetExample();
+		//Combinations combinations = new Combinations();
 		for(Sequence sequence : sequences){
 			
+			stopwatch.split();
+			LOGGER.info("Extracting sequence " + i + "/" + sequences.size() + " " + stopwatch); 
+			i++;
 			// vyber všechna oprávnění větší než k
 			if(sequence.size() < Parameters.minRoleSize.getValue()) {
 				//addRestPermissions(permissionSet, userUniquePermissionList.get(permissionSet));
@@ -47,23 +63,28 @@ public class RoleExtractor {
 			}
 			// zpracovani opravneni
 			subsetHelper.setInput(sequence.getPermissions());
-
+			//combinations.setInput(sequence.getPermissions());
+			
 			// hlavni limit
 			Integer maxLimit = Math.min(sequence.size(), Parameters.maxRoleSize.getValue());
 			
-			LOGGER.info("Current permission: " + sequence.size()  + " maxSize = " + maxLimit);
+			LOGGER.info("Current sequence size: " + sequence.size()  + " maxRoleSize = " + maxLimit );
 			
+			int n = 1, m = maxLimit - Parameters.minRoleSize.getValue();
 			for(int roleMaxSize = Parameters.minRoleSize.getValue(); roleMaxSize <= maxLimit; roleMaxSize++){
 				
 				// tvoříme skupiny pro konkrétní i
-				System.out.println("Groups of size " + roleMaxSize + ":" + sequence.size());
+				LOGGER.info("Groups of size " + roleMaxSize + ":" + sequence.size());
 				subsetHelper.setK(roleMaxSize);
 				subsetHelper.processSubsets();
 				
-				LOGGER.info("Extracting subset : done" + " " + subsetHelper.getSubsets().size());
+				List<List<Permission>> res = subsetHelper.getSubsets();
+				//List<List<Permission>> res = combinations.generateCombinations(roleMaxSize);
+				
+				LOGGER.info("Extracting subset " +  n + "/" + m + " done" + " " + res.size());
 				
 				// procházení výsledků setů a tvorba rolí
-				for(Set<Permission> sub: subsetHelper.getSubsets()){
+				for(List<Permission> sub: res){
 					
 					Role role = new Role();
 					role.setPermissions(sub);
@@ -72,14 +93,19 @@ public class RoleExtractor {
 					if(!candidateRoles.contains(role))
 						candidateRoles.add(role);
 					
-					
 				}	
+				n++;
 			}
+			
 		}
+			
 		
 		LOGGER.info("Candidate role list size:" + candidateRoles.size());
+		LOGGER.info("Finished calculating " + stopwatch);
+		
 	}
 	public List<Role> getCandidateRoles() {
 		return candidateRoles;
 	}
 }
+

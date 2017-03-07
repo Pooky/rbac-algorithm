@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import edu.jcu.rbac.common.IElement;
 import edu.jcu.rbac.elements.Permission;
 import edu.jcu.rbac.elements.RestPermission;
 import edu.jcu.rbac.elements.Role;
@@ -37,15 +38,15 @@ public class Cleaner {
 	/**
 	 * Očištění oprávnění a uživatelů
 	 * Ty které už jsou v rolích, tak odebereme ze zbytkových oprávnění
-	 * @param permissions
+	 * @param list
 	 * @param users
 	 */
-	private void cleanRestPermission(Set<Permission> permissions, List<User> users) {
+	private void cleanRestPermission(List<Permission> list, List<User> users) {
 		
 		Iterator<RestPermission> itr = restPermissions.iterator();
 		while(itr.hasNext()){
 			RestPermission rest = itr.next();
-			for(Permission perm : permissions){
+			for(Permission perm : list){
 				if(rest.getPermission().equals(perm)){
 					rest.removeAllUsers(users);
 				}
@@ -56,7 +57,12 @@ public class Cleaner {
 		}
 		
 	}
-	
+	/**
+	 * Pokud některé oprávnění nemáme v seqkvencích,
+	 * musíme ho zařadit do zbytkov
+	 * @param list
+	 * @param allPermissions
+	 */
 	public void calculateRestPermissionsFromSequences(List<Sequence> list, List<Permission> allPermissions){
 		
 		Set<Permission> uniquePermissions = new HashSet<Permission>();
@@ -70,7 +76,7 @@ public class Cleaner {
 		
 		// unique permissions z sekvenci
 		List<Permission> permissionsToBeSaved = new ArrayList<Permission>(allPermissions);
-		permissionsToBeSaved.retainAll(uniquePermissions);
+		permissionsToBeSaved.removeAll(uniquePermissions);
 		// uložíme do rest persmisisons
 		for(Permission perm : permissionsToBeSaved){
 			addRestPermission(perm, perm.getUsers());
@@ -123,6 +129,11 @@ public class Cleaner {
 			addRestPermission(permission, user);
 		}
 		
+	}
+
+
+	public  List<RestPermission> getRestPermissions() {
+		return this.restPermissions;
 	}
 
 

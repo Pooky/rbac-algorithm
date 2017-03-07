@@ -22,6 +22,7 @@ public class User implements IElement {
 
 	public User(String string) {
 		this.setName(string);
+		this.id = string;
 	}
 
 	public User setPermission(Permission permission){

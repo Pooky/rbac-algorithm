@@ -20,8 +20,8 @@ public class Source {
 	
 	private static final Logger LOGGER = Logger.getLogger( Source.class.getName() );
 
-	private ArrayList<User> users;
-	private ArrayList<Permission> permissions; 
+	private List<User> users;
+	private List<Permission> permissions; 
 	
 	public Source(){
 		
@@ -44,10 +44,17 @@ public class Source {
 	public List<User> initDataSet4(){
 		return this.getDataSet("data/test.csv");
 	}
+	public List<User> initDataSet5(){
+		return this.getDataSet("data/sqlresults/users_permission_from_roles_max_15_permission-19.02.17.csv");
+	}
+	public List<User> initDataSet6(){
+		return this.getDataSet("data/sqlresults/users_permission_from_roles_max_15_permission_fresh.csv");
+	}
 	/**
 	 * Vytvoření dat z db export
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	public List<User> getDataSet(String csvFileName){
 		
 		Map<String, Permission> permissions = new HashMap<String, Permission>();
@@ -72,7 +79,7 @@ public class Source {
 	                // use comma as separator
 	                String[] data = line.split(cvsSplitBy);
 	                if(data.length > 1){
-	                		LOGGER.log(Level.INFO, "User [id= " + data[0] + " , permission=" + data[1] + "]");
+	                		//LOGGER.log(Level.INFO, "User [id= " + data[0] + " , permission=" + data[1] + "]");
 	                }
                 	// přeskočíme první řádek
                 	if(data.length > 1 && i != 0){	
@@ -95,6 +102,7 @@ public class Source {
                 		if(perm == null){
                 			perm = new Permission("Oprávnění " + permId, permId);
                 			permissions.put(permId, perm);
+                  			
                 		}
                 		perm.addUser(user); // uživatel k oprávnění
                 		user.addPermission(perm); 	// vložíme oprávnění k uživateli	
@@ -180,7 +188,7 @@ public class Source {
 		users.add(new User("C# developer 2").addRole(basicRole).addRole(CSharpDeveloper));
 		users.add(new User("C# developer 3").addRole(basicRole).addRole(CSharpDeveloper));
 		users.add(new User("BI 2").addRole(basicRole).addRole(BiAnalysis));
-		users.add(new User("Wrong user").addPermission(outlook).addPermission(eLearning));
+		users.add(new User("Wrong user").addPermission(eLearning));
 
 		
 		for(User user : users){
@@ -192,20 +200,22 @@ public class Source {
 					
 			}
 		}
+			
 		
+		this.setUsers(users);
 		return users;
 		
 	}
-	public ArrayList<Permission> getPermissions() {
+	public List<Permission> getPermissions() {
 		return permissions;
 	}
-	public void setPermissions(ArrayList<Permission> permissions) {
+	public void setPermissions(List<Permission> permissions) {
 		this.permissions = permissions;
 	}
-	public ArrayList<User> getUsers() {
+	public List<User> getUsers() {
 		return users;
 	}
-	public void setUsers(ArrayList<User> users) {
+	public void setUsers(List<User> users) {
 		this.users = users;
 	}	
 	

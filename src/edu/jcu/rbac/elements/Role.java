@@ -14,7 +14,7 @@ import edu.jcu.rbac.common.IElement;
  */
 public class Role implements IElement {
 
-	Set<Permission> permissions = new HashSet<Permission>();
+	List<Permission> permissions = new ArrayList<Permission>();
 	List<User> users = new ArrayList<User>();
 	List<Role> childrens = new ArrayList<Role>();
 	Role parent;
@@ -26,12 +26,12 @@ public class Role implements IElement {
 		
 	}
 
-	public Set<Permission> getPermissions() {
+	public List<Permission> getPermissions() {
 		return permissions;
 	}
 
-	public void setPermissions(Set<Permission> permissions) {
-		this.permissions = permissions;
+	public void setPermissions(List<Permission> sub) {
+		this.permissions = sub;
 	}
 	
 	public String getIdentifier() {
@@ -46,7 +46,8 @@ public class Role implements IElement {
 		
 		// porovnání rolí
 		Role role = (Role) obj;
-		if(role.getPermissions().equals(this.getPermissions())){
+		
+		if(role.getPermissions().containsAll(this.getPermissions()) && this.getPermissions().containsAll(role.getPermissions())){
 			return true;
 		}
 		return false;
@@ -159,13 +160,13 @@ public class Role implements IElement {
 	}
 	/**
 	 * Obsahuje aktuální role s oprávněními některé z těchto oprávnění
-	 * @param permissionsToTest
+	 * @param list
 	 * @return
 	 */
-	public boolean containsAnyOfThisPermissions(Set<Permission> permissionsToTest) {
+	public boolean containsAnyOfThisPermissions(List<Permission> list) {
 		
 		for(Permission permission : getPermissions()){
-			if(permissionsToTest.contains(permission)){
+			if(list.contains(permission)){
 				return true;
 			}
 		}

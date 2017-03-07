@@ -26,6 +26,7 @@ public class Permission implements IElement {
 
 	public Permission(String string) {
 		this.setName(string);
+		this.setId(string);
 		this.users = new ArrayList<User>();
 	}
 

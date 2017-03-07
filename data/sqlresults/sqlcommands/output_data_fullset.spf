@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ContentFilters</key>
+	<dict/>
+	<key>auto_connect</key>
+	<true/>
+	<key>data</key>
+	<dict>
+		<key>connection</key>
+		<dict>
+			<key>database</key>
+			<string>rbac_data</string>
+			<key>host</key>
+			<string>127.0.0.1</string>
+			<key>name</key>
+			<string>RBAC mysql</string>
+			<key>rdbms_type</key>
+			<string>mysql</string>
+			<key>sslCACertFileLocation</key>
+			<string></string>
+			<key>sslCACertFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslCertificateFileLocation</key>
+			<string></string>
+			<key>sslCertificateFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>sslKeyFileLocation</key>
+			<string></string>
+			<key>sslKeyFileLocationEnabled</key>
+			<integer>0</integer>
+			<key>type</key>
+			<string>SPTCPIPConnection</string>
+			<key>useSSL</key>
+			<integer>0</integer>
+			<key>user</key>
+			<string>root</string>
+		</dict>
+		<key>session</key>
+		<dict>
+			<key>connectionEncoding</key>
+			<string>utf8</string>
+			<key>contentFilter</key>
+			<dict/>
+			<key>contentPageNumber</key>
+			<integer>1</integer>
+			<key>contentSelection</key>
+			<data>
+			YnBsaXN0MDDUAQIDBAUGJCVYJHZlcnNpb25YJG9iamVjdHNZJGFy
+			Y2hpdmVyVCR0b3ASAAGGoKgHCBMUFRYaIVUkbnVsbNMJCgsMDxJX
+			TlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6INDoACgAOiEBGABIAF
+			gAdUdHlwZVRyb3dzXxAdU2VsZWN0aW9uRGV0YWlsVHlwZU5TSW5k
+			ZXhTZXTSFwsYGVxOU1JhbmdlQ291bnQQAIAG0hscHR5aJGNsYXNz
+			bmFtZVgkY2xhc3Nlc1pOU0luZGV4U2V0oh8gWk5TSW5kZXhTZXRY
+			TlNPYmplY3TSGxwiI1xOU0RpY3Rpb25hcnmiIiBfEA9OU0tleWVk
+			QXJjaGl2ZXLRJidUZGF0YYABAAgAEQAaACMALQAyADcAQABGAE0A
+			VQBgAGcAagBsAG4AcQBzAHUAdwB8AIEAoQCmALMAtQC3ALwAxwDQ
+			ANsA3gDpAPIA9wEEAQcBGQEcASEAAAAAAAACAQAAAAAAAAAoAAAA
+			AAAAAAAAAAAAAAABIw==
+			</data>
+			<key>contentSortColIsAsc</key>
+			<true/>
+			<key>contentViewport</key>
+			<string>{{0, 0}, {1240, 640}}</string>
+			<key>isToolbarVisible</key>
+			<true/>
+			<key>queries</key>
+			<string>SELECT * FROM user_role ORDER by id_role;
+SELECT * FROM permission_role;
+
+/** Vybrání dat z výstupu pro kontrolu - uživatel 18 **/
+SELECT t1.id_user,t2.id_permission FROM user_role as t1
+JOIN permission_role as t2 ON t1.id_role = t2.id_role
+WHERE id_user = 18
+UNION
+SELECT id_user, id_permission FROM user_permission WHERE id_user = 18;
+
+/** Vybrání rolí z cvičných dat **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+  WHERE roles.c &lt; 15 group by roles.id_role; 
+
+SELECT * FROM user_role where id_user = 18;
+SELECT * FROM permission_role where id_permission = 4731;
+
+SELECT id_user, id_permission FROM user_permission WHERE id_user = 18;
+
+
+ 
+SELECT roles.id_role, id_user FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15 ORDER by roles.id_role;
+
+
+SELECT id_user, id_permission FROM( 
+SELECT id_role FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC) as res
+WHERE res.c &lt; 15) as x2
+JOIN user_role ON x2.id_role = user_role.id_role
+JOIN permission_role as x3 ON x2.id_role = x3.id_role;
+
+</string>
+			<key>table</key>
+			<string>user_role</string>
+			<key>view</key>
+			<string>SP_VIEW_CUSTOMQUERY</string>
+			<key>windowVerticalDividerPosition</key>
+			<real>200</real>
+		</dict>
+	</dict>
+	<key>encrypted</key>
+	<false/>
+	<key>format</key>
+	<string>connection</string>
+	<key>queryFavorites</key>
+	<array/>
+	<key>queryHistory</key>
+	<array>
+		<string>/** Vybrání rolí **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+  WHERE roles.c &lt; 15 group by roles.id_role</string>
+		<string>SELECT roles.id_role, id_user FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15 ORDER by roles.id_role</string>
+		<string>SELECT id_user, id_permission FROM( 
+SELECT id_role FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC) as res
+WHERE res.c &lt; 15) as x2
+JOIN user_role ON x2.id_role = user_role.id_role
+JOIN permission_role as x3 ON x2.id_role = x3.id_role</string>
+		<string>/** Vybrání rolí **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+  WHERE roles.c &lt; 2 group by roles.id_role</string>
+		<string>/** Vybrání rolí **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+  WHERE roles.c &lt; 10 group by roles.id_role</string>
+		<string>/** Vybrání rolí **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+  group by roles.id_role</string>
+		<string>SELECT * FROM user_role ORDER by id_role</string>
+		<string>SELECT * FROM user_role</string>
+		<string>/** Vybrání rolí **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 100 group by roles.id_role</string>
+		<string>/** Vybrání rolí **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 20 group by roles.id_role</string>
+		<string>/** Vybrání rolí **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15 group by roles.id_role</string>
+		<string>SELECT DISTINCT roles.id_role, id_user FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15 ORDER by roles.id_role</string>
+		<string>SELECT DISTINCT roles.id_role, id_user FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15</string>
+		<string>/** Vybrání rolí **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15 group by user_role.id_user</string>
+		<string>SELECT DISTINCT roles.id_role FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15</string>
+		<string>SELECT roles.id_role, user_role.id_user FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15</string>
+		<string>SELECT roles.id_role FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15</string>
+		<string>SELECT roles.id_role FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles  WHERE roles.c &lt; 15</string>
+		<string>/** Vybrání rolí **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15 AND roles.c &gt; 5 group by user_role.id_user</string>
+		<string>/** Vybrání rolí **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 15 AND roles.c &gt; 5</string>
+	</array>
+	<key>rdbms_type</key>
+	<string>mysql</string>
+	<key>rdbms_version</key>
+	<string>5.7.16</string>
+	<key>version</key>
+	<integer>1</integer>
+</dict>
+</plist>

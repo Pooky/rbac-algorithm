@@ -16,6 +16,7 @@ import edu.jcu.rbac.elements.Role;
 import edu.jcu.rbac.elements.Sequence;
 import edu.jcu.rbac.elements.User;
 
+
 public class Main {
 	/**
 	 * 
@@ -30,15 +31,24 @@ public class Main {
 		Source source = new Source();
 		Cleaner cleaner = new Cleaner(restPermissions);
 		
-		source.initDataSet3(); // permissions 256:users:39
+		//source.getDataMock(); 
+		source.initDataSet6(); // permissions 256:users:39
 		
-		restPermissions.addAll(Rules.removePermissionWhichCantMakeRole(source)); // removed 214 
-		List<Sequence> list = Rules.createSequences(source); // sequence ok
+		RulesManager rulesManager = new RulesManager(cleaner, source);
 		
+		rulesManager.removePermissionWhichCantMakeRole(); // removed 214 
+		List<Sequence> list = rulesManager.createSequences2(); // sequence ok
+
+		
+		/**
+		 * Problém je v rest permission, je tam fůra blbostí i pro uživatele, který takové permission nemá
+		 * Opraveno
+		 */
 		cleaner.calculateRestPermissionsFromSequences(list, source.getPermissions());
 		
 		RoleExtractor roleExtractor = new RoleExtractor(list);
-		roleExtractor.extractRolesFromUser();
+		roleExtractor.extractRolesFromUser();	
+
 		
 		//Utils.printRoles(roleExtractor.getCandidateRoles());
 		Integer x = Utils.checkDuplicities(roleExtractor.getCandidateRoles());

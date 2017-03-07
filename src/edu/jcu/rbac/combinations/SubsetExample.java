@@ -11,15 +11,15 @@ import edu.jcu.rbac.elements.Permission;
 //@author http://stackoverflow.com/a/29914908
 public class SubsetExample {
 
-	private List<Set<Permission>> subsets;
+	private List<List<Permission>> subsets;
 	private List<Permission> input;
 	private int k;
 	
-	public List<Set<Permission>> getSubsets() {
+	public List<List<Permission>> getSubsets() {
 		return subsets;
 	}
 	public SubsetExample(){
-		this.subsets = new ArrayList<Set<Permission>>();
+		this.subsets = new ArrayList<List<Permission>>();
 	}
 	
 	
@@ -67,13 +67,14 @@ public class SubsetExample {
 	 * @param subset
 	 * @return
 	 */
-	public Set<Permission> getSubset(List<Permission> input, int[] subset) {
+	@SuppressWarnings("unchecked")
+	public List<Permission> getSubset(List<Permission> input, int[] subset) {
 	    
 		Set<Permission> result = new HashSet<Permission>();	
 	    for (int i = 0; i < subset.length; i++) 
 	        result.add(input.get(subset[i]));
 	    
-	    return result;
+	    return new ArrayList<Permission>(result);
 	}
 	public List<Permission> getInput() {
 		return input;

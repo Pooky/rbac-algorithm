@@ -11,6 +11,10 @@ public class Sequence {
 	private List<Permission> permissions;
 	private List<User> users;
 	
+	public Sequence(List<Permission> list){
+		this.permissions = list;
+	}
+	
 	public Sequence(){
 		this.permissions = new ArrayList<Permission>();
 	}
@@ -112,7 +116,7 @@ public class Sequence {
 		return false;
 
 	}
-	
-	
-	
 }
+	
+	
+	

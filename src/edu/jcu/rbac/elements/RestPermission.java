@@ -42,7 +42,6 @@ public class RestPermission implements IElement {
     public boolean equals(Object object){
     	
     	RestPermission restPermission = (RestPermission)object;
-    	
     	if(this.getPermission().equals(restPermission.getPermission())){
     		return true;
     	}else{
