@@ -3,7 +3,6 @@ package edu.jcu.rbac.elements;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.jcu.rbac.common.Parameters;
 import edu.jcu.rbac.common.Utils;
 
 public class Sequence {
@@ -47,7 +46,7 @@ public class Sequence {
 				commonUsers.retainAll(secondPerm.getUsers());
 				
 				// musí mít stejné elementy
-				if(commonUsers.size() < Parameters.minUsersForRole.getValue()){
+				if(commonUsers.size() < Utils.getConfig().getMinUsersForRole()){
 					isValid = false;
 					break;
 				}

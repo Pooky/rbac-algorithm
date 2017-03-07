@@ -8,9 +8,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.lang3.time.StopWatch;
 
-import edu.jcu.rbac.combinations.Combinations;
 import edu.jcu.rbac.combinations.SubsetExample;
-import edu.jcu.rbac.common.Parameters;
 import edu.jcu.rbac.common.Utils;
 import edu.jcu.rbac.elements.Permission;
 import edu.jcu.rbac.elements.Role;
@@ -50,14 +48,14 @@ public class RoleExtractor {
 		LOGGER.info("Starting long calculations: " + stopwatch);
 		
 		SubsetExample subsetHelper = new SubsetExample();
-		//Combinations combinations = new Combinations();
+
 		for(Sequence sequence : sequences){
 			
 			stopwatch.split();
 			LOGGER.info("Extracting sequence " + i + "/" + sequences.size() + " " + stopwatch); 
 			i++;
 			// vyber všechna oprávnění větší než k
-			if(sequence.size() < Parameters.minRoleSize.getValue()) {
+			if(sequence.size() < Utils.getConfig().getMinRoleSize()) {
 				//addRestPermissions(permissionSet, userUniquePermissionList.get(permissionSet));
 				continue;
 			}
@@ -66,12 +64,12 @@ public class RoleExtractor {
 			//combinations.setInput(sequence.getPermissions());
 			
 			// hlavni limit
-			Integer maxLimit = Math.min(sequence.size(), Parameters.maxRoleSize.getValue());
+			Integer maxLimit = Math.min(sequence.size(), Utils.getConfig().getMaxRoleSize());
 			
 			LOGGER.info("Current sequence size: " + sequence.size()  + " maxRoleSize = " + maxLimit );
 			
-			int n = 1, m = maxLimit - Parameters.minRoleSize.getValue();
-			for(int roleMaxSize = Parameters.minRoleSize.getValue(); roleMaxSize <= maxLimit; roleMaxSize++){
+			int n = 1, m = maxLimit - Utils.getConfig().getMinRoleSize();
+			for(int roleMaxSize = Utils.getConfig().getMinRoleSize(); roleMaxSize <= maxLimit; roleMaxSize++){
 				
 				// tvoříme skupiny pro konkrétní i
 				LOGGER.info("Groups of size " + roleMaxSize + ":" + sequence.size());

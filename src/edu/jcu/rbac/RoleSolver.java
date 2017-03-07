@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import edu.jcu.rbac.combinations.SubsetExample;
-import edu.jcu.rbac.common.Parameters;
+import edu.jcu.rbac.common.Utils;
 import edu.jcu.rbac.elements.Permission;
 import edu.jcu.rbac.elements.RestPermission;
 import edu.jcu.rbac.elements.Role;
@@ -188,7 +188,7 @@ public class RoleSolver {
 	private boolean canWeSplitRoles(Role roleToBeSplited, Role roleToKeep){
 		
 		// test jestli můžeme role dělit, k je nejmenší velikost role
-		if((roleToBeSplited.getPermissions().size() - roleToKeep.getPermissions().size()) < Parameters.minRoleSize.getValue()){
+		if((roleToBeSplited.getPermissions().size() - roleToKeep.getPermissions().size()) < Utils.getConfig().getMinRoleSize()){
 			return false;
 		}else{
 			return true;
@@ -269,8 +269,8 @@ public class RoleSolver {
 		    		return -1;
 		    	}else{
 		    		
-		    		int diffA = Math.abs(roleA.getPermissionsCount() - Parameters.optimalRoleSize.getValue());
-		    		int diffB = Math.abs(roleB.getPermissionsCount() - Parameters.optimalRoleSize.getValue());
+		    		int diffA = Math.abs(roleA.getPermissionsCount() - Utils.getConfig().getOptimalRoleSize());
+		    		int diffB = Math.abs(roleB.getPermissionsCount() - Utils.getConfig().getOptimalRoleSize());
 		    		// rozdíl v optimální velikosti
 		    		if(diffA < diffB){
 		    			return -1;

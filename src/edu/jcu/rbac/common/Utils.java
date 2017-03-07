@@ -13,7 +13,7 @@ import edu.jcu.rbac.elements.Sequence;
 
 public class Utils {
 	
-	
+	static Config config;
 	static Logger logger  = Logger.getLogger(Main.class.getName());
 	
 	public static String toString(List<? extends IElement> permissions) {
@@ -54,6 +54,13 @@ public class Utils {
 		    return roles.size() - set.size();
 		}
 		return -1;
+	}
+	
+	public static Config getConfig(){
+		return config;
+	}
+	public static void setConfig(Config config){
+		Utils.config = config;
 	}
 	
 	

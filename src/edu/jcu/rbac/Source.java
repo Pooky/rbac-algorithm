@@ -1,6 +1,7 @@
 package edu.jcu.rbac;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +32,9 @@ public class Source {
 		
 	}
 	
+	public List<User> initDataSet(String filepath){
+		return this.getDataSet(filepath);
+	}
 	
 	public List<User> initDataSet1(){
 		return this.getDataSet("data/test-data3.csv");
@@ -53,9 +57,19 @@ public class Source {
 	/**
 	 * Vytvoření dat z db export
 	 * @return
+	 * @throws Exception 
 	 */
 	@SuppressWarnings("unused")
 	public List<User> getDataSet(String csvFileName){
+		
+		if(!new File(csvFileName).exists()){
+			try {
+				throw new Exception("Soubor neexistuje");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+			
 		
 		Map<String, Permission> permissions = new HashMap<String, Permission>();
 		Map<String, User> users = new HashMap<String, User>();

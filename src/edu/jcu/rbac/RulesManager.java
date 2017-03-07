@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import org.apache.commons.lang3.time.StopWatch;
 
-import edu.jcu.rbac.common.Parameters;
 import edu.jcu.rbac.common.Utils;
 import edu.jcu.rbac.elements.Permission;
 import edu.jcu.rbac.elements.RestPermission;
@@ -41,7 +40,7 @@ public class RulesManager {
 		Iterator<Permission> itr = source.getPermissions().iterator();
 		while(itr.hasNext()){
 			Permission permission = itr.next();
-			if(permission.getUsers().size() < Parameters.minUsersForRole.getValue()){
+			if(permission.getUsers().size() < Utils.getConfig().getMinUsersForRole()){
 				
 				cleaner.addRestPermission(permission, permission.getUsers());
 				// odebereme to oprávnění
@@ -69,7 +68,7 @@ public class RulesManager {
 			User user = itr.next();
 			Sequence sequence = new Sequence(user.getPermissions());
 			
-			if(sequence.size() >= Parameters.minRoleSize.getValue()){
+			if(sequence.size() >= Utils.getConfig().getMinRoleSize()){
 			
 				if(!resultSequencesList.contains(sequence)){
 					resultSequencesList.add(sequence);	
@@ -133,7 +132,7 @@ public class RulesManager {
 				}	
 
 				// zkontrolujeme velikost
-				if(sequence.size() >= Parameters.minRoleSize.getValue()){
+				if(sequence.size() >= Utils.getConfig().getMinRoleSize()){
 					if(!resultSequencesList.contains(sequence))
 						resultSequencesList.add(sequence);
 				}
