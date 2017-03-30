@@ -58,20 +58,18 @@ public class RulesManager {
 	 * Vytvoření seqvenkcí, z kterých budou následně extrahovány kandidátní role
 	 * @return 
 	 */
-	public List<Sequence> createSequences(){
+	public List<List<Permission>> joinPermissionLists(){
 		
-		List<Sequence> resultSequencesList = new ArrayList<Sequence>();
+		List<List<Permission>> resultUniqueLists = new ArrayList<List<Permission>>();
 		
 		Iterator<User> itr = source.getUsers().iterator();
 		while(itr.hasNext()){
 			
 			User user = itr.next();
-			Sequence sequence = new Sequence(user.getPermissions());
+			if(user.getPermissions().size() >= Utils.getConfig().getMinRoleSize()){
 			
-			if(sequence.size() >= Utils.getConfig().getMinRoleSize()){
-			
-				if(!resultSequencesList.contains(sequence)){
-					resultSequencesList.add(sequence);	
+				if(!resultUniqueLists.contains(user.getPermissions())){
+					resultUniqueLists.add(user.getPermissions());
 				}
 				
 			}else{
@@ -79,7 +77,7 @@ public class RulesManager {
 			}
 		}
 		
-		return resultSequencesList;
+		return resultUniqueLists;
 		
 	}
 	
@@ -90,7 +88,7 @@ public class RulesManager {
 	 * @return 
 	 */
 	
-	public List<Sequence> createSequences2(){
+	public List<Sequence> createSequences(List<List<Permission>> lists){
 		
 		final StopWatch stopwatch = new StopWatch();
 		stopwatch.start();
@@ -98,48 +96,36 @@ public class RulesManager {
 		LOGGER.info("Starting sequences2 : " + stopwatch);
 		
 		List<Sequence> resultSequencesList = new ArrayList<Sequence>();
-		List<Permission> testedPermissions = new ArrayList<Permission>();
-		
-		Iterator<Permission> permIterator = source.getPermissions().iterator();
-		while(permIterator.hasNext()){
-			
-			Permission firstPerm = permIterator.next();	
-			for(User user : firstPerm.getUsers()){
+		int i = 1;
+		for(List<Permission> list : lists){
+			 
+			Iterator<Permission> itr = list.iterator();
+			LOGGER.info("Processing list: " + i + "/" + lists.size() + "(" + list.size() + ") :" + stopwatch); i++;
+			while(itr.hasNext()){
 				
-				LOGGER.info("Extracting sequence " + user.getIdentifier() + " perm: " + firstPerm.getIdentifier()); 
-				LOGGER.info("Stopwatch: " + stopwatch);
+				Sequence seq = new Sequence(); 
+				Permission startingPermission = itr.next();
+				seq.addPermission(startingPermission);
 				
-				// sequence
-				Sequence sequence = new Sequence();
-				// první prvek
-				sequence.addPermission(firstPerm);
-
-				for(Permission secondPerm :  user.getPermissions()){
-					if(secondPerm.equals(firstPerm)){
-						//LOGGER.info("skiping same permission");
-						continue;
+				for(Permission perm : list){
+					
+					if(perm != startingPermission);
+					seq.addPermission(perm);
+					if(!seq.isValid()){
+						seq.removePermission(perm);
 					}
 					
-					boolean sequenceChanged = sequence.addPermission(secondPerm);
-					
-					if(sequenceChanged){
-						// check sequnce, splňuje pravidla?
-						if(!sequence.isValid()){
-							// odebereme poslední prvek
-							sequence.removePermission(secondPerm);
-						}
-					}
-				}	
-
-				// zkontrolujeme velikost
-				if(sequence.size() >= Utils.getConfig().getMinRoleSize()){
-					if(!resultSequencesList.contains(sequence))
-						resultSequencesList.add(sequence);
 				}
 				
-			}
+				// zkontrolujeme velikost
+				if(seq.size() >= Utils.getConfig().getMinRoleSize() && seq.size() < 10){
+					if(!resultSequencesList.contains(seq))
+						resultSequencesList.add(seq);
+				}	
+			}			
 		}
 		
+		LOGGER.info("Generating sequences finished: " + stopwatch);
 		
 		return resultSequencesList;
 		

@@ -9,7 +9,7 @@ import edu.jcu.rbac.elements.Permission;
 
 
 //@author http://stackoverflow.com/a/29914908
-public class SubsetExample {
+public class SubsetHelper {
 
 	private List<List<Permission>> subsets;
 	private List<Permission> input;
@@ -18,7 +18,7 @@ public class SubsetExample {
 	public List<List<Permission>> getSubsets() {
 		return subsets;
 	}
-	public SubsetExample(){
+	public SubsetHelper(){
 		this.subsets = new ArrayList<List<Permission>>();
 	}
 	

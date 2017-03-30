@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import edu.jcu.rbac.combinations.SubsetExample;
+import edu.jcu.rbac.combinations.SubsetHelper;
 import edu.jcu.rbac.common.Utils;
 import edu.jcu.rbac.elements.Permission;
 import edu.jcu.rbac.elements.RestPermission;
@@ -262,6 +262,7 @@ public class RoleSolver {
 		    {
 		    	Role roleA = (Role)o1;
 		    	Role roleB = (Role)o2;
+		    	
 		    	// setřídění
 		    	if(roleA.getUsers().size() < roleB.getUsers().size()){
 		    		return 1;
@@ -271,6 +272,7 @@ public class RoleSolver {
 		    		
 		    		int diffA = Math.abs(roleA.getPermissionsCount() - Utils.getConfig().getOptimalRoleSize());
 		    		int diffB = Math.abs(roleB.getPermissionsCount() - Utils.getConfig().getOptimalRoleSize());
+		    		
 		    		// rozdíl v optimální velikosti
 		    		if(diffA < diffB){
 		    			return -1;
@@ -286,6 +288,7 @@ public class RoleSolver {
 		    
 		    }
 		});
+		
 		return rolesToSort;
 		
 	}

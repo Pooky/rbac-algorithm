@@ -66,7 +66,9 @@ public class Main {
 		RulesManager rulesManager = new RulesManager(cleaner, source);
 		
 		rulesManager.removePermissionWhichCantMakeRole(); // removed 214 
-		List<Sequence> list = rulesManager.createSequences(); // sequence ok
+		
+		List<List<Permission>> joinedPermissionList = rulesManager.joinPermissionLists();
+		List<Sequence> list = rulesManager.createSequences(joinedPermissionList); // sequence ok
 
 		
 		/**
@@ -76,7 +78,7 @@ public class Main {
 		cleaner.calculateRestPermissionsFromSequences(list, source.getPermissions());
 		
 		RoleExtractor roleExtractor = new RoleExtractor(list);
-		roleExtractor.extractRolesFromUser();	
+		roleExtractor.extractRoles();	
 
 		
 		//Utils.printRoles(roleExtractor.getCandidateRoles());

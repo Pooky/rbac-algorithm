@@ -1,7 +1,8 @@
 <project name="RBACModel" default="dist" basedir=".">
 	<description>
-		simple exae
+		RBAC Algorithm
 	</description>
+
 	<!-- set global properties for this build -->
 	<property name="src" location="src"/>
 	<property name="build" location="build"/>
@@ -20,7 +21,7 @@
 	<target name="compile" depends="init">
 	  <echo>=== COMPILE ===</echo>
 
-	  <echo>Compiling ${src.dir} files ...</echo>
+	  <echo>Compiling ${src} files ...</echo>
 	  <javac srcdir="${src}" destdir="${build}" includeantruntime="false" >
 		  <classpath>
                  <fileset dir="${lib}">

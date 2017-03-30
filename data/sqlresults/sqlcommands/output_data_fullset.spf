@@ -11,7 +11,7 @@
 		<key>connection</key>
 		<dict>
 			<key>database</key>
-			<string>rbac_data</string>
+			<string>rbac_data_output_1</string>
 			<key>host</key>
 			<string>127.0.0.1</string>
 			<key>name</key>
@@ -41,8 +41,6 @@
 		<dict>
 			<key>connectionEncoding</key>
 			<string>utf8</string>
-			<key>contentFilter</key>
-			<dict/>
 			<key>contentPageNumber</key>
 			<integer>1</integer>
 			<key>contentSelection</key>
@@ -62,19 +60,23 @@
 			<key>contentSortColIsAsc</key>
 			<true/>
 			<key>contentViewport</key>
-			<string>{{0, 0}, {1240, 640}}</string>
+			<string>{{0, 0}, {694, 450}}</string>
 			<key>isToolbarVisible</key>
 			<true/>
 			<key>queries</key>
 			<string>SELECT * FROM user_role ORDER by id_role;
-SELECT * FROM permission_role;
+SELECT DISTINCT id_role FROM permission_role;
+
+SELECT id_role, COUNT(`id_permission`) FROM permission_role GROUP BY id_role;
 
 /** Vybrání dat z výstupu pro kontrolu - uživatel 18 **/
 SELECT t1.id_user,t2.id_permission FROM user_role as t1
 JOIN permission_role as t2 ON t1.id_role = t2.id_role
-WHERE id_user = 18
+WHERE id_user = 1
 UNION
-SELECT id_user, id_permission FROM user_permission WHERE id_user = 18;
+SELECT id_user, id_permission FROM user_permission WHERE id_user = 1;
+
+
 
 /** Vybrání rolí z cvičných dat **/
 SELECT roles.id_role, COUNT(id_user) FROM(
@@ -82,7 +84,7 @@ SELECT id_role,COUNT(id_permission) as c FROM permission_role
  group by id_role ORDER by c DESC
  ) as roles 
  JOIN user_role ON user_role.id_role = roles.id_role
-  WHERE roles.c &lt; 15 group by roles.id_role; 
+  WHERE roles.c &lt; 10 group by roles.id_role; 
 
 SELECT * FROM user_role where id_user = 18;
 SELECT * FROM permission_role where id_permission = 4731;
@@ -96,24 +98,24 @@ SELECT id_role,COUNT(id_permission) as c FROM permission_role
  group by id_role ORDER by c DESC
  ) as roles 
 JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 15 ORDER by roles.id_role;
+ WHERE roles.c &lt; 10 ORDER by roles.id_role;
 
 
 SELECT id_user, id_permission FROM( 
 SELECT id_role FROM(
 SELECT id_role,COUNT(id_permission) as c FROM permission_role
  group by id_role ORDER by c DESC) as res
-WHERE res.c &lt; 15) as x2
+WHERE res.c &lt; 10) as x2
 JOIN user_role ON x2.id_role = user_role.id_role
 JOIN permission_role as x3 ON x2.id_role = x3.id_role;
 
 </string>
 			<key>table</key>
-			<string>user_role</string>
+			<string>user_permission</string>
 			<key>view</key>
 			<string>SP_VIEW_CUSTOMQUERY</string>
 			<key>windowVerticalDividerPosition</key>
-			<real>200</real>
+			<real>207</real>
 		</dict>
 	</dict>
 	<key>encrypted</key>
@@ -124,6 +126,66 @@ JOIN permission_role as x3 ON x2.id_role = x3.id_role;
 	<array/>
 	<key>queryHistory</key>
 	<array>
+		<string>SELECT * FROM user_role
+SELECT * FROM permission_role
+UNION
+SELECT id_user, id_permission FROM user_permission</string>
+		<string>SELECT DISTINCT id_role FROM permission_role</string>
+		<string>SELECT DISTINCT roles.id_role FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 10 ORDER by roles.id_role</string>
+		<string>SELECT DISTINCT roles.id_role, roles.id_role, id_user FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 10 ORDER by roles.id_role</string>
+		<string>SELECT DISTINCT id_role, roles.id_role, id_user FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 10 ORDER by roles.id_role</string>
+		<string>SELECT id_user, id_permission FROM( 
+SELECT id_role FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC) as res
+WHERE res.c &lt; 10) as x2
+JOIN user_role ON x2.id_role = user_role.id_role
+JOIN permission_role as x3 ON x2.id_role = x3.id_role</string>
+		<string>SELECT id_role, COUNT(`id_permission`) FROM permission_role GROUP BY id_role</string>
+		<string>SELECT id_role, COUNT(`id_role`) FROM permission_role GROUP BY id_role</string>
+		<string>SELECT id_role FROM permission_role GROUP BY id_role</string>
+		<string>SELECT COUNT(id_role) FROM permission_role GROUP BY id_role</string>
+		<string>SELECT * FROM user_role ORDER by id_role</string>
+		<string>SELECT t1.id_user,t2.id_permission,t1.id_role FROM user_role as t1
+JOIN permission_role as t2 ON t1.id_role = t2.id_role
+WHERE id_user = 1</string>
+		<string>SELECT t1.id_user,t2.id_permission FROM user_role as t1
+JOIN permission_role as t2 ON t1.id_role = t2.id_role
+WHERE id_user = 1</string>
+		<string>/** Vybrání dat z výstupu pro kontrolu - uživatel 18 **/
+SELECT t1.id_user,t2.id_permission FROM user_role as t1
+JOIN permission_role as t2 ON t1.id_role = t2.id_role
+WHERE id_user = 1
+UNION
+SELECT id_user, id_permission FROM user_permission WHERE id_user = 1</string>
+		<string>SELECT roles.id_role, id_user FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+JOIN user_role ON user_role.id_role = roles.id_role
+ WHERE roles.c &lt; 10 ORDER by roles.id_role</string>
+		<string>/** Vybrání rolí z cvičných dat **/
+SELECT roles.id_role, COUNT(id_user) FROM(
+SELECT id_role,COUNT(id_permission) as c FROM permission_role
+ group by id_role ORDER by c DESC
+ ) as roles 
+ JOIN user_role ON user_role.id_role = roles.id_role
+  WHERE roles.c &lt; 10 group by roles.id_role</string>
 		<string>/** Vybrání rolí **/
 SELECT roles.id_role, COUNT(id_user) FROM(
 SELECT id_role,COUNT(id_permission) as c FROM permission_role
@@ -151,98 +213,6 @@ SELECT id_role,COUNT(id_permission) as c FROM permission_role
  ) as roles 
  JOIN user_role ON user_role.id_role = roles.id_role
   WHERE roles.c &lt; 2 group by roles.id_role</string>
-		<string>/** Vybrání rolí **/
-SELECT roles.id_role, COUNT(id_user) FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
- JOIN user_role ON user_role.id_role = roles.id_role
-  WHERE roles.c &lt; 10 group by roles.id_role</string>
-		<string>/** Vybrání rolí **/
-SELECT roles.id_role, COUNT(id_user) FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
- JOIN user_role ON user_role.id_role = roles.id_role
-  group by roles.id_role</string>
-		<string>SELECT * FROM user_role ORDER by id_role</string>
-		<string>SELECT * FROM user_role</string>
-		<string>/** Vybrání rolí **/
-SELECT roles.id_role, COUNT(id_user) FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
- JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 100 group by roles.id_role</string>
-		<string>/** Vybrání rolí **/
-SELECT roles.id_role, COUNT(id_user) FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
- JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 20 group by roles.id_role</string>
-		<string>/** Vybrání rolí **/
-SELECT roles.id_role, COUNT(id_user) FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
- JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 15 group by roles.id_role</string>
-		<string>SELECT DISTINCT roles.id_role, id_user FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
-JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 15 ORDER by roles.id_role</string>
-		<string>SELECT DISTINCT roles.id_role, id_user FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
-JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 15</string>
-		<string>/** Vybrání rolí **/
-SELECT roles.id_role, COUNT(id_user) FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
- JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 15 group by user_role.id_user</string>
-		<string>SELECT DISTINCT roles.id_role FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
-JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 15</string>
-		<string>SELECT roles.id_role, user_role.id_user FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
-JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 15</string>
-		<string>SELECT roles.id_role FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
-JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 15</string>
-		<string>SELECT roles.id_role FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles  WHERE roles.c &lt; 15</string>
-		<string>/** Vybrání rolí **/
-SELECT roles.id_role, COUNT(id_user) FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
- JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 15 AND roles.c &gt; 5 group by user_role.id_user</string>
-		<string>/** Vybrání rolí **/
-SELECT roles.id_role, COUNT(id_user) FROM(
-SELECT id_role,COUNT(id_permission) as c FROM permission_role
- group by id_role ORDER by c DESC
- ) as roles 
- JOIN user_role ON user_role.id_role = roles.id_role
- WHERE roles.c &lt; 15 AND roles.c &gt; 5</string>
 	</array>
 	<key>rdbms_type</key>
 	<string>mysql</string>

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.lang3.time.StopWatch;
 
-import edu.jcu.rbac.combinations.SubsetExample;
+import edu.jcu.rbac.combinations.SubsetHelper;
 import edu.jcu.rbac.common.Utils;
 import edu.jcu.rbac.elements.Permission;
 import edu.jcu.rbac.elements.Role;
@@ -36,7 +36,7 @@ public class RoleExtractor {
 	/**
 	 * Extract all roles from set
 	 */
-	public void extractRolesFromUser(){
+	public void extractRoles(){
 
 		final StopWatch stopwatch = new StopWatch();
 		stopwatch.start();
@@ -47,7 +47,7 @@ public class RoleExtractor {
 		LOGGER.info("Extracting all roles");
 		LOGGER.info("Starting long calculations: " + stopwatch);
 		
-		SubsetExample subsetHelper = new SubsetExample();
+		SubsetHelper subsetHelper = new SubsetHelper();
 
 		for(Sequence sequence : sequences){
 			
